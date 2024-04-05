@@ -9,7 +9,7 @@ services:
       - .:/app
     depends_on:
       - db
-    command: python manage.py runserver 0.0.0.0:8000 --noreload
+    command: sh -c "sleep 10 && python manage.py runserver 0.0.0.0:8000 --noreload"
   db:
     image: postgres
     environment:
