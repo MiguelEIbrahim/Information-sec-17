@@ -1,9 +1,7 @@
-# voting/views.py
-from django.urls import reverse_lazy
-from django.views.generic import CreateView
-from .forms import SignUpForm
+from django.shortcuts import render
+from django.views import View
 
-class SignUpView(CreateView):
-    form_class = SignUpForm
-    success_url = reverse_lazy('login')
-    template_name = 'registration/signup.html'
+class SignUpView(View):
+    def get(self, request):
+        # Add your signup logic here
+        return render(request, 'signup.html')

@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+    command: ["./wait-for-it.sh", "db:5432", "--", "python", "manage.py", "runserver_plus", "0.0.0.0:8000"]
+    # Add the wait-for-it.sh script to the web service
+
+  db:
+    image: postgres
+    environment:
+      POSTGRES_DB: mydatabase
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
