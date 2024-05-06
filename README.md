@@ -14,6 +14,6 @@ Email address: xyz@example.com
 
 The final step is to enter the password. We need to enter the password twice, the second time as a confirmation of the first.  
 
-Password: ****** ( Miguel9021@!)
-Password (again): ****** (Miguel9021@!)
+Password: ****** 
+Password (again): ****** 
 Superuser created successfully.
