@@ -1,18 +1,19 @@
-# Django how to:
+Create an Admin User
 
+Step-1: Run the command given below to create a user who can login to the admin site. 
 
-Run:
-python manage.py makemigrations
-python manage.py migrate
+python manage.py createsuperuser
 
+It will prompt username which we need to enter. 
 
-then:
-python manage.py runserver
+Username: miguel
 
+Now it will prompt an email address which again we need to enter here.  
 
-go to: http://127.0.0.1:8000/
+Email address: xyz@example.com
 
+The final step is to enter the password. We need to enter the password twice, the second time as a confirmation of the first.  
 
-
-# With Docker:
-docker-compose up --build
+Password: ****** ( Miguel9021@!)
+Password (again): ****** (Miguel9021@!)
+Superuser created successfully.
