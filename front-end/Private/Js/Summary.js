@@ -26,7 +26,7 @@ const ministers = [
         party: 'Valhalla Legion',
         shortMission: 'Human Rights',
         detailedMission: 'Thor is quite focused on protecting human rights, he says he wants to bring his mjolnir down on justice, no idea what that means.',
-        leaning: 'Right',
+        leaning: 'Neutral',
         image: '../img/Thor.jpg'
     },
     // Add more ministers as needed
