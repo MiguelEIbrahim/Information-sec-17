@@ -83,8 +83,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function handleVote(ministerName) {
-    const token = localStorage.getItem('voteToken');
-    if (token) {
+    const encryptedVoteToken = localStorage.getItem('encryptedVoteToken');
+    if (encryptedVoteToken) {
         alert('You have already voted.');
         return;
     }
@@ -94,16 +94,19 @@ function handleVote(ministerName) {
         return;
     }
 
-    const voteToken = new Date().getTime().toString();
-    localStorage.setItem('voteToken', voteToken);
-    localStorage.setItem('votedFor', ministerName);
-    alert(`You voted for ${ministerName}`);
+    const voteToken = generateRandomToken();
+    const secretKey = deriveKeyFromToken(voteToken);
+    const encryptedToken = encryptToken(voteToken, secretKey);
+    localStorage.setItem('encryptedVoteToken', encryptedToken);
+    localStorage.setItem('voteSecretKey', secretKey.toString()); // Store the key for later validation
+
+    alert('Your vote has been cast.');
     updateVoteButtons();
 }
 
 function checkIfVoted() {
-    const token = localStorage.getItem('voteToken');
-    if (token) {
+    const encryptedVoteToken = localStorage.getItem('encryptedVoteToken');
+    if (encryptedVoteToken) {
         updateVoteButtons();
     }
 }
@@ -114,4 +117,17 @@ function updateVoteButtons() {
         button.disabled = true;
         button.textContent = 'Vote (already voted)';
     });
+}
+
+function generateRandomToken() {
+    return Math.random().toString(36).substring(2) + Date.now().toString(36);
+}
+
+function deriveKeyFromToken(token) {
+    const salt = CryptoJS.lib.WordArray.random(128 / 8);
+    return CryptoJS.PBKDF2(token, salt, { keySize: 256 / 32, iterations: 1000 });
+}
+
+function encryptToken(token, key) {
+    return CryptoJS.AES.encrypt(token, key).toString();
 }
