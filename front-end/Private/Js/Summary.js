@@ -48,7 +48,12 @@ document.addEventListener('DOMContentLoaded', () => {
             <p>Sex: ${minister.sex}</p>
             <p>Party: ${minister.party}</p>
             <p>Mission: ${minister.shortMission}</p>
+            <button class="vote-button" data-name="${minister.name}">Vote</button>
         `;
+        profileCard.querySelector('.vote-button').addEventListener('click', (e) => {
+            e.stopPropagation();
+            handleVote(minister.name);
+        });
         profileCard.addEventListener('click', () => {
             profileDetails.innerHTML = `
                 <h2>${minister.name}</h2>
@@ -73,4 +78,34 @@ document.addEventListener('DOMContentLoaded', () => {
             modal.style.display = 'none';
         }
     });
+
+    checkIfVoted();
 });
+
+function handleVote(ministerName) {
+    const token = localStorage.getItem('voteToken');
+    if (token) {
+        alert('You have already voted.');
+        return;
+    }
+    const voteToken = new Date().getTime().toString();
+    localStorage.setItem('voteToken', voteToken);
+    localStorage.setItem('votedFor', ministerName);
+    alert(`You voted for ${ministerName}`);
+    updateVoteButtons();
+}
+
+function checkIfVoted() {
+    const token = localStorage.getItem('voteToken');
+    if (token) {
+        updateVoteButtons();
+    }
+}
+
+function updateVoteButtons() {
+    const voteButtons = document.querySelectorAll('.vote-button');
+    voteButtons.forEach(button => {
+        button.disabled = true;
+        button.textContent = 'Vote (already voted)';
+    });
+}
