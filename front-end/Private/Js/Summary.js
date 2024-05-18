@@ -48,7 +48,12 @@ document.addEventListener('DOMContentLoaded', () => {
             <p>Sex: ${minister.sex}</p>
             <p>Party: ${minister.party}</p>
             <p>Mission: ${minister.shortMission}</p>
+            <button class="vote-button" data-name="${minister.name}">Vote</button>
         `;
+        profileCard.querySelector('.vote-button').addEventListener('click', (e) => {
+            e.stopPropagation();
+            handleVote(minister.name);
+        });
         profileCard.addEventListener('click', () => {
             profileDetails.innerHTML = `
                 <h2>${minister.name}</h2>
@@ -73,4 +78,56 @@ document.addEventListener('DOMContentLoaded', () => {
             modal.style.display = 'none';
         }
     });
+
+    checkIfVoted();
 });
+
+function handleVote(ministerName) {
+    const encryptedVoteToken = localStorage.getItem('encryptedVoteToken');
+    if (encryptedVoteToken) {
+        alert('You have already voted.');
+        return;
+    }
+
+    const userConfirmed = confirm(`Are you sure you want to vote for ${ministerName}?`);
+    if (!userConfirmed) {
+        return;
+    }
+
+    const voteToken = generateRandomToken();
+    const secretKey = deriveKeyFromToken(voteToken);
+    const encryptedToken = encryptToken(voteToken, secretKey);
+    localStorage.setItem('encryptedVoteToken', encryptedToken);
+    localStorage.setItem('voteSecretKey', secretKey.toString()); // Store the key for later validation
+
+    alert('Your vote has been cast.');
+    updateVoteButtons();
+}
+
+function checkIfVoted() {
+    const encryptedVoteToken = localStorage.getItem('encryptedVoteToken');
+    if (encryptedVoteToken) {
+        updateVoteButtons();
+    }
+}
+
+function updateVoteButtons() {
+    const voteButtons = document.querySelectorAll('.vote-button');
+    voteButtons.forEach(button => {
+        button.disabled = true;
+        button.textContent = 'Vote (already voted)';
+    });
+}
+
+function generateRandomToken() {
+    return Math.random().toString(36).substring(2) + Date.now().toString(36);
+}
+
+function deriveKeyFromToken(token) {
+    const salt = CryptoJS.lib.WordArray.random(128 / 8);
+    return CryptoJS.PBKDF2(token, salt, { keySize: 256 / 32, iterations: 1000 });
+}
+
+function encryptToken(token, key) {
+    return CryptoJS.AES.encrypt(token, key).toString();
+}
