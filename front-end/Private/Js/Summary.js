@@ -88,6 +88,12 @@ function handleVote(ministerName) {
         alert('You have already voted.');
         return;
     }
+
+    const userConfirmed = confirm(`Are you sure you want to vote for ${ministerName}?`);
+    if (!userConfirmed) {
+        return;
+    }
+
     const voteToken = new Date().getTime().toString();
     localStorage.setItem('voteToken', voteToken);
     localStorage.setItem('votedFor', ministerName);
