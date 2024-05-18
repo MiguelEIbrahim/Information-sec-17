@@ -10,22 +10,14 @@
 
 </head>
 <body>
+    <div class="centered-container">
     <h1>Authenticate with itsme®</h1>
     <a href="./Authenticate.html">
         <button id="itsmeLogin">Login with itsme®</button>
     </a>
 
-    <script>
-        document.getElementById('itsmeLogin').addEventListener('click', () => {
-            // Redirect to itsme® login page
-            const clientId = 'YOUR_CLIENT_ID';
-            const redirectUri = encodeURIComponent('YOUR_REDIRECT_URI');
-            const state = encodeURIComponent('some_random_state'); // Use a random string for security
-            const scope = encodeURIComponent('profile');
-            const authUrl = `https://merchant.itsme.be/oidc/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}&scope=${scope}&response_type=code`;
-
-            window.location.href = authUrl;
-        });
-    </script>
+        </div>
+    </a>
+    <p> Since itsme is a paid software we just reroute to the next page.</p>
 </body>
 </html>
