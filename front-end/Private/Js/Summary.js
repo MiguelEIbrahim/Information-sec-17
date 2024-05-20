@@ -95,7 +95,6 @@ function handleVote(ministerName) {
     }
 
     localStorage.setItem('hasVoted', true);
-    localStorage.setItem('votedFor', ministerName);
 
     alert('Your vote has been cast.');
     updateVoteButtons();
