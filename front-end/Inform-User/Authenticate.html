@@ -12,22 +12,31 @@
 
             const name = document.getElementById('name').value;
 
-            // Send a request to the backend to check if the name exists in the database
-            const response = await fetch('/check-name', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ name })
-            });
+            try {
+                // Send a request to the backend to check if the name exists in the database
+                const response = await fetch('/check-name', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name })
+                });
 
-            const result = await response.json();
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
 
-            // Redirect based on the result
-            if (result.exists) {
-                window.location.href = '/front-end/Inform-User/vote.html';
-            } else {
-                window.location.href = '/front-end/Inform-User/NotRegistered.html';
+                const result = await response.json();
+
+                // Redirect based on the result
+                if (result.exists) {
+                    window.location.href = '/front-end/Inform-User/vote.html';
+                } else {
+                    window.location.href = '/front-end/Inform-User/NotRegistered.html';
+                }
+            } catch (error) {
+                console.error('There was a problem with the fetch operation:', error);
+                alert('An error occurred. Please try again.');
             }
         }
     </script>
