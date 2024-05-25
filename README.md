@@ -19,3 +19,15 @@ Go to file: setup.sql to setup your server, for us we will be using mysql as it 
 
 MySQL has a depreciated MD5 encoding so we will be setting up using a newer AES 128 or ECC, we will be using ECC since its harder to crash the ECC code.
 
+
+To start:
+create a new database: Upler  (we chose a random name so that people wont go by using texbook names to try to SQL inject)
+
+
+We have table names: 
+- Bohemian
+and
+- Yondora
+For these names its best to guess which one is which and you'll see why later
+
+Check the ER Diagram here in root folder under name: Octahedral_ChatGPTimg.png
