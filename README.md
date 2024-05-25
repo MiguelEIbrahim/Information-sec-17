@@ -37,7 +37,7 @@ Rectangles: Entity - Tables
 
 Circles: Values - Variables - etc.
 
-Rhumbus: Relation (Ex: Many Bohemians Poke Yondora, One Yondora can be poked by one Bohemian).
+Rhumbus: Relation (Ex: Many Bohemians Poke Yondora, One Yondora can be poked by many Bohemians).
 
 1-m : One to many relationship
 
@@ -58,4 +58,10 @@ Additional Questions:
 - What if you have a mouse tracker and a virus on your laptop already?
     It's an interesting question because they could be some key loggers and mouse trackers as a virus and you could probably receive these two months or one year beofre the election by email as a malicious email and you downloaded it by mistake, this is defenitly an invasion of privacy and it is not allowed, but the most that would get out if someone knows the position of the candidates on the screen and they can estimate the pixel values, etc.. this means they know who you voted for more or less. We can probably randomize the location of the candidates on the screen per person, but that would mean one person would have the same screen as another and it is inevitable.
 
-    Say: 11.69 million people in Belgium (2022) of which 11.03 million have acess to wifi, and say 70 candidates for 2024, without raplcaement the same person cannot be in the same box as the previous
+   Say: 11.69 million people in Belgium (2022) of which 11.03 million have acess to wifi, and say 70 candidates for 2024, without raplcaement the same person cannot be in the same box as the previous 70 factorial is the answer and it is possible:
+    11978571669969891796
+    07278372168909873645
+    89381425464258575553
+    62864628009582789845
+    31968000000000000000
+    0. Yes its alot of numbers, so yes it is possible to randomize the selection.
