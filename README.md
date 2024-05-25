@@ -31,3 +31,15 @@ and
 For these names its best to guess which one is which and you'll see why later
 
 Check the ER Diagram here in root folder under name: Octahedral_ChatGPTimg.png
+
+
+Rectangles: Entity - Tables
+
+Circles: Values - Variables - etc.
+
+Rhumbus: Relation (Ex: Many Bohemians Poke Yondora, One Yondora can be poked by one Bohemian).
+
+1-m : One to many relationship
+
+The relation is also its own table, but in this case it does not contain anything since the Bohemian gets destroyed.
+
