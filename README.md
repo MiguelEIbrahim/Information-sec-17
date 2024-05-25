@@ -37,7 +37,7 @@ Rectangles: Entity - Tables
 
 Circles: Values - Variables - etc.
 
-Rhumbus: Relation (Ex: Many Bohemians Poke Yondora, One Yondora can be poked by one Bohemian).
+Rhumbus: Relation (Ex: Many Bohemians Poke Yondora, One Yondora can be poked by many Bohemians).
 
 1-m : One to many relationship
 
@@ -64,4 +64,4 @@ Additional Questions:
     89381425464258575553
     62864628009582789845
     31968000000000000000
-    0. Yes its alot of numbers
+    0. Yes its alot of numbers, so yes it is possible to randomize the selection.
