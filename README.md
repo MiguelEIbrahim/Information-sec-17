@@ -1,1 +1,1 @@
-
+say 70 candidates for 2024, without raplcaement the same person cannot be in the same box as the previous
