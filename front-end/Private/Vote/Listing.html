@@ -8,9 +8,7 @@
     <link rel="icon" href="../../../img/logo-black.png" type="image/png">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://trusted-cdn.com;">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-
 </head>
-
 <body>
     <h1>Minister Profiles</h1>
     <div id="profiles">
@@ -24,6 +22,26 @@
         </div>
     </div>
 
-    <script src="../Js/Summary.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('fetch_candidates.php')
+                .then(response => response.json())
+                .then(data => {
+                    const profilesContainer = document.getElementById('profiles');
+                    data.forEach(candidate => {
+                        const profileDiv = document.createElement('div');
+                        profileDiv.className = 'profile';
+                        profileDiv.innerHTML = `
+                            <h2>${candidate.Name}</h2>
+                            <p>Elder: ${candidate.Elder}</p>
+                            <p>Num Times Poked: ${candidate.Num_Times_Poked}</p>
+                            <p>Evil Plan: ${candidate.Evil_Plan}</p>
+                        `;
+                        profilesContainer.appendChild(profileDiv);
+                    });
+                })
+                .catch(error => console.error('Error fetching candidates:', error));
+        });
+    </script>
 </body>
 </html>
