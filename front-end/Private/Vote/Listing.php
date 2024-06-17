@@ -1,47 +1,3 @@
-<?php
-
-// Database connection details (replace with your actual credentials)
-$servername = "localhost";
-$username = "root";
-$password = "root";
-$dbname = "upler";
-
-// Create connection
-$conn = mysqli_connect($servername, $username, $password, $dbname);
-
-// Check connection
-if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
-}
-
-// Prepare a secure SQL statement to prevent SQL injection
-$sql = "SELECT Name, Elder, Num_Times_Poked FROM yondora";
-$stmt = mysqli_prepare($conn, $sql);
-
-// Execute the prepared statement
-if (!$stmt->execute()) {
-    echo "Error: " . $stmt->error;
-}
-
-// Bind results to variables (optional, but improves readability)
-$stmt->bind_result($name, $elder, $num_times_poked);
-
-// Fetch data from the database
-$profiles = array();
-while ($stmt->fetch()) {
-    $profiles[] = array(
-        "name" => $name,
-        "elder" => $elder,
-        "num_times_poked" => $num_times_poked,
-    );
-}
-
-// Close the prepared statement and connection
-$stmt->close();
-$conn->close();
-
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -52,52 +8,94 @@ $conn->close();
   <link rel="icon" href="../../../img/logo-black.png" type="image/png">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://trusted-cdn.com;">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
 </head>
 <body>
 
-  <h1>Minister Profiles</h1>
-  <div id="profiles">
-    <?php foreach ($profiles as $profile): ?>
-      <div class="profile-card">
-        <h2><?php echo htmlspecialchars($profile["name"]); ?></h2>
-        <p>Elder: <?php echo $profile["elder"] ? 'Yes' : 'No'; ?></p>
-        <p>Number of Times Poked: <?php echo $profile["num_times_poked"]; ?></p>
-        <button data-profile-name="<?php echo htmlspecialchars($profile["name"]); ?>">View Details</button>
-      </div>
-    <?php endforeach; ?>
-  </div>
+<h1>Minister Profiles</h1>
 
-  <div id="modal" class="modal">
-    <div class="modal-content">
-      <span class="close-button">&times;</span>
-      <div id="profile-details"></div>
+<div id="profiles">
+  <?php
+
+  // Database connection details (replace with your actual credentials)
+  $servername = "localhost";
+  $username = "root";
+  $password = "";
+  $dbname = "upler";
+
+  // Create connection
+  $conn = mysqli_connect($servername, $username, $password, $dbname);
+
+  // Check connection
+  if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+  }
+
+  // Prepare a secure SQL statement to prevent SQL injection
+  $sql = "SELECT Name, Elder, Num_Times_Poked FROM yondora";
+  $stmt = mysqli_prepare($conn, $sql);
+
+  // Execute the prepared statement
+  if (!$stmt->execute()) {
+    echo "Error: " . $stmt->error;
+  }
+
+  // Bind results to variables (optional, but improves readability)
+  $stmt->bind_result($name, $elder, $num_times_poked);
+
+  // Fetch data from the database
+  $profiles = array();
+  while ($stmt->fetch()) {
+    // Replace spaces in name with underscores for image path
+    $imageName = str_replace(' ', '_', $name);
+
+    $profiles[] = array(
+      "name" => $name,
+      "elder" => $elder,
+      "num_times_poked" => $num_times_poked,
+      "image" => $imageName . '.jpg' // Assuming jpg format
+    );
+  }
+
+  // Close the prepared statement and connection
+  $stmt->close();
+  $conn->close();
+
+  ?>
+
+  <?php foreach ($profiles as $profile): ?>
+    <div class="profile-card">
+      <h2><?php echo htmlspecialchars($profile["name"]); ?></h2>
+      <?php $imagePath = "../img/"; ?>
+      <img src="<?php echo $imagePath . $profile['image']; ?>" class="profile-image">
+      <p>Age: <?php echo $profile["elder"] ?></p>
+
+      <button data-profile-name="<?php echo htmlspecialchars($profile["name"]); ?>">Vote</button>
+
     </div>
+  <?php endforeach; ?>
+</div>
+
+<div id="modal" class="modal">
+  <div class="modal-content">
+    <span class="close-button">&times;</span>
+    <div id="profile-details"></div>
   </div>
+</div>
 
-  <script>
-    const modal = document.getElementById("modal");
-    const closeButton = document.querySelector(".close-button");
-    const profileDetails = document.getElementById("profile-details");
+<script>
+  const voteButtons = document.querySelectorAll('button[data-profile-name]');
 
-    const profileCards = document.querySelectorAll(".profile-card button");
-    profileCards.forEach(button => {
-      button.addEventListener("click", () => {
-        const profileName = button.dataset.profileName;
-        // Fetch detailed profile data using AJAX or another method here
-        // and update the profileDetails element accordingly
-        profileDetails.innerHTML = `<h2>Loading profile details for ${profileName}...</h2>`;
-      });
+  voteButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const profileName = button.dataset.profileName;
+      // Implement functionality to handle vote (e.g., alert, update UI)
+      alert(`You voted for ${profileName}`);
     });
+  });
 
-    closeButton.addEventListener("click", () => {
-      modal.style.display = "none";
-    });
+  // Add remaining JavaScript code for modal handling etc. (existing code)
+</script>
 
-    window.addEventListener("click", (event) => {
-      if (event.target === modal) {
-        modal.style.display = "none";
-      }
-    });
-  </script>
 </body>
 </html>
