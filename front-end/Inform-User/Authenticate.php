@@ -9,12 +9,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username']);
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
+    $verifyPassword = trim($_POST['verify_password']);
 
-    // Basic validation (improve as needed)
-    if (empty($username) || empty($email) || empty($password)) {
-        $errorMessage = "Username, email, and password are required.";
+    // Basic validation
+    if (empty($username) || empty($email) || empty($password) || empty($verifyPassword)) {
+        $errorMessage = "All fields are required.";
     } else if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $errorMessage = "Invalid email format.";
+    } else if ($password !== $verifyPassword) {
+        $errorMessage = "Passwords do not match.";
     } else {
 
         // Generate random salt and encryption key
@@ -39,14 +42,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $iv = openssl_random_pseudo_bytes(16);
         $encryptedMessage = openssl_encrypt($sensitiveData, 'aes-256-cbc', $combinedKey, OPENSSL_RAW_DATA, $iv);
 
-        // Connect to database (replace with your connection details)
-        $conn = new mysqli("localhost", "username", "password", "database_name");
+        // Connect to database
+        $conn = new mysqli("localhost", "root", "", "database_name"); // Use XAMPP defaults
         if ($conn->connect_error) {
             die("Connection failed: " . $conn->connect_error);
         }
 
         // Prepare and execute insert query with secure parameters
-        $stmt = $conn->prepare("INSERT INTO BohemianNew (Name, AnonymizedIP, HashedMAC, EncryptedMessage, IV) VALUES (?, ?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO Bohemian (Name, AnonymizedIP, HashedMAC, EncryptedMessage, IV) VALUES (?, ?, ?, ?, ?)");
         $stmt->bind_param("sssss", $username, $anonymizedIP, $hashedMAC, $encryptedMessage, $iv);
         if ($stmt->execute()) {
 
@@ -70,23 +73,95 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!DOCTYPE html>
 <html>
 <head>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+
+        .container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .container label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .container input[type="text"],
+        .container input[type="email"],
+        .container input[type="password"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .container input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 16px;
+        }
+
+        .container input[type="submit"]:hover {
+            background-color: #218838;
+        }
+
+        .error-message {
+            color: red;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .success-message {
+            color: green;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+    </style>
     <title>Sign Up</title>
+    <link rel="icon" href="../../img/logo-black.png" type="image/png">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://trusted-cdn.com;">
 </head>
 <body>
-  <?php if (!empty($errorMessage)) : ?>
-    <p style="color: red;"><?= $errorMessage ?></p>
-  <?php endif; ?>
-  <?php if (isset($message)) : ?>
-    <p><?= $message ?></p>
-  <?php endif; ?>
-  <form method="post">
-    <label for="username">Name:</label>
-    <input type="text" name="username" id="username" required><br><br>
-    <label for="email">Email:</label>
-    <input type="email" name="email" id="email" required><br><br>
-    <label for="password">Password:</label>
-    <input type="password" name="password" id="password" required><br><br>
-    <input type="submit" value="Sign Up">
-  </form>
+    <div class="container">
+        <h2>Sign Up</h2>
+        <?php if (!empty($errorMessage)) : ?>
+            <p class="error-message"><?= $errorMessage ?></p>
+        <?php endif; ?>
+        <?php if (isset($message)) : ?>
+            <p class="success-message"><?= $message ?></p>
+        <?php endif; ?>
+        <form method="post">
+            <label for="username">Username:</label>
+            <input type="text" name="username" id="username" required>
+            <label for="email">Email:</label>
+            <input type="email" name="email" id="email" required>
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password" required>
+            <label for="verify_password">Verify Password:</label>
+            <input type="password" name="verify_password" id="verify_password" required>
+            <input type="submit" value="Sign Up">
+        </form>
+    </div>
 </body>
 </html>
