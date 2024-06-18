@@ -26,14 +26,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             die("Connection failed: " . $conn->connect_error);
         }
 
-        // Check if username or email already exists
-        $stmt = $conn->prepare("SELECT Name FROM Bohemian WHERE Name=? OR Email=?");
-        $stmt->bind_param("ss", $username, $email);
+        // Check if MAC and IP are already associated with a different email
+        $stmt = $conn->prepare("SELECT Email FROM Bohemian WHERE (AnonymizedIP=? AND HashedMAC=?) AND Email != ?");
+        $stmt->bind_param("sss", $anonymizedIP, $hashedMAC, $email);
+        
+        // Anonymize IP and hash MAC for encryption key
+        $ip = $_SERVER['REMOTE_ADDR'];
+        $mac = exec('getmac'); // This will get the MAC address of the server, adjust accordingly for clients
+        $anonymizedIP = hash('sha256', $ip);
+        $hashedMAC = hash('sha256', $mac);
+
         $stmt->execute();
         $stmt->store_result();
 
         if ($stmt->num_rows > 0) {
-            $errorMessage = "Username or email already exists.";
+            $errorMessage = "MAC and IP are already associated with a different email.";
         } else {
             // Generate random salt and encryption key
             $salt = base64_encode(random_bytes(16));
@@ -45,21 +52,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Generate a unique OTP
             $otp = rand(100000, 999999);
 
-            // Anonymize IP and hash MAC for encryption key
-            $ip = $_SERVER['REMOTE_ADDR'];
-            $mac = exec('getmac'); // This will get the MAC address of the server, adjust accordingly for clients
-            $anonymizedIP = hash('sha256', $ip);
-            $hashedMAC = hash('sha256', $mac);
-            $combinedKey = substr(hash('sha256', $anonymizedIP . $hashedMAC), 0, 32);
-
             // Example sensitive data to be encrypted
             $sensitiveData = "Sensitive data example";
             $iv = openssl_random_pseudo_bytes(16);
             $encryptedMessage = openssl_encrypt($sensitiveData, 'aes-256-cbc', $combinedKey, OPENSSL_RAW_DATA, $iv);
 
             // Prepare and execute insert query with secure parameters
-            $stmt = $conn->prepare("INSERT INTO Bohemian (Name, Email, PasswordHash, AnonymizedIP, HashedMAC, EncryptedMessage, IV) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("sssssss", $username, $email, $passwordHash, $anonymizedIP, $hashedMAC, $encryptedMessage, $iv);
+            $stmt = $conn->prepare("INSERT INTO Bohemian (Name, AnonymizedIP, HashedMAC, EncryptedMessage, IV, Email) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("ssssss", $username, $anonymizedIP, $hashedMAC, $encryptedMessage, $iv, $email);
             if ($stmt->execute()) {
 
                 // Send OTP email (replace with your email sending logic)
