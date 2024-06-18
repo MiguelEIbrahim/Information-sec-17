@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 18, 2024 at 10:48 AM
+-- Generation Time: Jun 18, 2024 at 11:23 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -33,8 +33,16 @@ CREATE TABLE `bohemian` (
   `AnonymizedIP` varchar(255) NOT NULL,
   `HashedMAC` varchar(255) NOT NULL,
   `EncryptedMessage` varbinary(4096) NOT NULL,
-  `IV` varbinary(16) NOT NULL
+  `IV` varbinary(16) NOT NULL,
+  `Email` mediumtext NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `bohemian`
+--
+
+INSERT INTO `bohemian` (`ID`, `Name`, `AnonymizedIP`, `HashedMAC`, `EncryptedMessage`, `IV`, `Email`) VALUES
+(1, 'Miguel', '12ca17b49af2289436f303e0166030a21e525d266e209267433801a8fd4071a0', '14589e2d4298c1b514c22730db7d9713b5c16acbfbe749836a3db70290817ac4', 0xbcd82a14eb8b3fc04b0ec6bf85d34e2ff18111f9cf5330586fe645dcf90cacdf, 0xc58cd95c727a47dbe6290680ac4af1e6, '');
 
 -- --------------------------------------------------------
 
@@ -174,7 +182,7 @@ ALTER TABLE `yondora`
 -- AUTO_INCREMENT for table `bohemian`
 --
 ALTER TABLE `bohemian`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Constraints for dumped tables

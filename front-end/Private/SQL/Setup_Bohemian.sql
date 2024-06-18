@@ -1,8 +1,10 @@
 CREATE TABLE Bohemian (
     ID INT AUTO_INCREMENT PRIMARY KEY,
     Name VARCHAR(255) NOT NULL,
-    AnonymizedIP VARCHAR(255) NOT NULL,
+      AnonymizedIP VARCHAR(255) NOT NULL,
     HashedMAC VARCHAR(255) NOT NULL,
     EncryptedMessage VARBINARY(4096) NOT NULL,
-    IV VARBINARY(16) NOT NULL
+    IV VARBINARY(16) NOT NULL,
+    Email VARCHAR(25500) UNIQUE NOT NULL, -- Added Email field with UNIQUE constraint
+  
 );
