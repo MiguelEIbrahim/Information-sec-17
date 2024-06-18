@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 // Error message variable
 $errorMessage = "";
 
@@ -56,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt_check_email->execute();
         $stmt_check_email->store_result();
         if ($stmt_check_email->num_rows > 0) {
-            $errorMessage = "Account Exists";
+            $errorMessage = "Account with this email already exists.";
             $stmt_check_email->close();
             $conn->close();
             // Handle error or redirect as needed
@@ -67,6 +69,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt_insert = $conn->prepare("INSERT INTO Bohemian (Name, AnonymizedIP, HashedMAC, EncryptedMessage, IV, Email) VALUES (?, ?, ?, ?, ?, ?)");
             $stmt_insert->bind_param("ssssss", $username, $anonymizedIP, $hashedMAC, $encryptedMessage, $iv, $email);
             if ($stmt_insert->execute()) {
+
+                // Get the ID of the inserted user
+                $userID = $stmt_insert->insert_id;
+
+                // Store user ID in session
+                $_SESSION['user_id'] = $userID;
 
                 // Send OTP email (replace with your email sending logic)
                 $subject = "Account Verification for " . $username;
