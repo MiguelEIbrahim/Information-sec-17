@@ -5,78 +5,84 @@ $errorMessage = "";
 // Check if form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    // Get user data
-    $username = trim($_POST['username']);
-    $email = trim($_POST['email']);
-    $password = trim($_POST['password']);
-    $verifyPassword = trim($_POST['verify_password']);
+    // Get user data and sanitize inputs
+    $username = isset($_POST['username']) ? trim($_POST['username']) : '';
+    $email = isset($_POST['email']) ? trim($_POST['email']) : '';
+    $password = isset($_POST['password']) ? $_POST['password'] : '';
+    $verifyPassword = isset($_POST['verify_password']) ? $_POST['verify_password'] : '';
 
     // Basic validation
     if (empty($username) || empty($email) || empty($password) || empty($verifyPassword)) {
         $errorMessage = "All fields are required.";
     } else if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $errorMessage = "Invalid email format.";
+    } else if (strlen($password) < 8) {
+        $errorMessage = "Password must be at least 8 characters long.";
     } else if ($password !== $verifyPassword) {
         $errorMessage = "Passwords do not match.";
     } else {
 
-        // Connect to database
-        $conn = new mysqli("localhost", "root", "", "upler"); // Use XAMPP defaults
+        // Generate random salt and encryption key
+        $salt = base64_encode(random_bytes(16));
+        $encryptionKey = base64_encode(random_bytes(32));
+
+        // Generate a secure password hash
+        $passwordHash = password_hash($password, PASSWORD_DEFAULT);
+
+        // Generate a unique OTP (for example purposes)
+        $otp = rand(100000, 999999);
+
+        // Anonymize IP and hash MAC for encryption key (adjust as per your server/client setup)
+        $ip = $_SERVER['REMOTE_ADDR'];
+        $mac = exec('getmac'); // Adjust as needed for clients
+        $anonymizedIP = hash('sha256', $ip);
+        $hashedMAC = hash('sha256', $mac);
+        $combinedKey = substr(hash('sha256', $anonymizedIP . $hashedMAC), 0, 32);
+
+        // Example sensitive data to be encrypted
+        $sensitiveData = "Sensitive data example";
+        $iv = openssl_random_pseudo_bytes(16);
+        $encryptedMessage = openssl_encrypt($sensitiveData, 'aes-256-cbc', $combinedKey, OPENSSL_RAW_DATA, $iv);
+
+        // Connect to database (replace with your connection details)
+        $conn = new mysqli("localhost", "root", "", "upler"); // Replace with your DB credentials
         if ($conn->connect_error) {
             die("Connection failed: " . $conn->connect_error);
         }
 
-        // Check if MAC and IP are already associated with a different email
-        $stmt = $conn->prepare("SELECT Email FROM Bohemian WHERE (AnonymizedIP=? AND HashedMAC=?) AND Email != ?");
-        $stmt->bind_param("sss", $anonymizedIP, $hashedMAC, $email);
-        
-        // Anonymize IP and hash MAC for encryption key
-        $ip = $_SERVER['REMOTE_ADDR'];
-        $mac = exec('getmac'); // This will get the MAC address of the server, adjust accordingly for clients
-        $anonymizedIP = hash('sha256', $ip);
-        $hashedMAC = hash('sha256', $mac);
-
-        $stmt->execute();
-        $stmt->store_result();
-
-        if ($stmt->num_rows > 0) {
-            $errorMessage = "MAC and IP are already associated with a different email.";
+        // Check if user with the same email already exists
+        $stmt_check_email = $conn->prepare("SELECT ID FROM Bohemian WHERE Email = ?");
+        $stmt_check_email->bind_param("s", $email);
+        $stmt_check_email->execute();
+        $stmt_check_email->store_result();
+        if ($stmt_check_email->num_rows > 0) {
+            $errorMessage = "Account with this email already exists.";
+            $stmt_check_email->close();
+            $conn->close();
+            // Handle error or redirect as needed
         } else {
-            // Generate random salt and encryption key
-            $salt = base64_encode(random_bytes(16));
-            $encryptionKey = base64_encode(random_bytes(32));
-
-            // Generate a secure password hash
-            $passwordHash = password_hash($password, PASSWORD_DEFAULT, ['cost' => 12]);
-
-            // Generate a unique OTP
-            $otp = rand(100000, 999999);
-
-            // Example sensitive data to be encrypted
-            $sensitiveData = "Sensitive data example";
-            $iv = openssl_random_pseudo_bytes(16);
-            $encryptedMessage = openssl_encrypt($sensitiveData, 'aes-256-cbc', $combinedKey, OPENSSL_RAW_DATA, $iv);
+            $stmt_check_email->close();
 
             // Prepare and execute insert query with secure parameters
-            $stmt = $conn->prepare("INSERT INTO Bohemian (Name, AnonymizedIP, HashedMAC, EncryptedMessage, IV, Email) VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssssss", $username, $anonymizedIP, $hashedMAC, $encryptedMessage, $iv, $email);
-            if ($stmt->execute()) {
+            $stmt_insert = $conn->prepare("INSERT INTO Bohemian (Name, AnonymizedIP, HashedMAC, EncryptedMessage, IV, Email) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt_insert->bind_param("ssssss", $username, $anonymizedIP, $hashedMAC, $encryptedMessage, $iv, $email);
+            if ($stmt_insert->execute()) {
 
                 // Send OTP email (replace with your email sending logic)
                 $subject = "Account Verification for " . $username;
                 $message = "Your OTP to verify your account is: " . $otp;
                 mail($email, $subject, $message);
 
-                // Redirect to another page
-                header("Location: ../../../../Information-sec-17/front-end/Private/Vote/Listing.php");
+                // Redirect to another page after successful registration
+                header("Location: success.php");
                 exit();
             } else {
                 $errorMessage = "Error creating account: " . $conn->error;
             }
-        }
 
-        $stmt->close();
-        $conn->close();
+            $stmt_insert->close();
+            $conn->close();
+        }
     }
 }
 ?>
@@ -150,17 +156,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     </style>
     <title>Sign Up</title>
-    <link rel="icon" href="../../img/logo-black.png" type="image/png">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://trusted-cdn.com;">
 </head>
 <body>
     <div class="container">
         <h2>Sign Up</h2>
         <?php if (!empty($errorMessage)) : ?>
             <p class="error-message"><?= $errorMessage ?></p>
-        <?php endif; ?>
-        <?php if (isset($message)) : ?>
-            <p class="success-message"><?= $message ?></p>
         <?php endif; ?>
         <form method="post">
             <label for="username">Username:</label>
