@@ -1,51 +1,92 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Authenticate User</title>
-    <link rel="stylesheet" href="../../front-end/CSS/index.css">
-    <link rel="icon" href="../../img/logo-black.png" type="image/png">
-    <script>
-        async function checkName(event) {
-            event.preventDefault(); // Prevent the form from submitting the traditional way
+<?php
+// Error message variable
+$errorMessage = "";
 
-            const name = document.getElementById('name').value;
+// Check if form is submitted
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-            try {
-                // Send a request to the backend to check if the name exists in the database
-                const response = await fetch('/check-name', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ name })
-                });
+    // Get user data
+    $username = trim($_POST['username']);
+    $email = trim($_POST['email']);
+    $password = trim($_POST['password']);
 
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
+    // Basic validation (improve as needed)
+    if (empty($username) || empty($email) || empty($password)) {
+        $errorMessage = "Username, email, and password are required.";
+    } else if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errorMessage = "Invalid email format.";
+    } else {
 
-                const result = await response.json();
+        // Generate random salt and encryption key
+        $salt = base64_encode(random_bytes(16));
+        $encryptionKey = base64_encode(random_bytes(32));
 
-                // Redirect based on the result
-                if (result.exists) {
-                    window.location.href = '/front-end/Inform-User/vote.html';
-                } else {
-                    window.location.href = '/front-end/Inform-User/NotRegistered.html';
-                }
-            } catch (error) {
-                console.error('There was a problem with the fetch operation:', error);
-                alert('An error occurred. Please try again.');
-            }
+        // Generate a secure password hash
+        $passwordHash = password_hash($password, PASSWORD_DEFAULT, ['cost' => 12]);
+
+        // Generate a unique OTP
+        $otp = rand(100000, 999999);
+
+        // Anonymize IP and hash MAC for encryption key
+        $ip = $_SERVER['REMOTE_ADDR'];
+        $mac = exec('getmac'); // This will get the MAC address of the server, adjust accordingly for clients
+        $anonymizedIP = hash('sha256', $ip);
+        $hashedMAC = hash('sha256', $mac);
+        $combinedKey = substr(hash('sha256', $anonymizedIP . $hashedMAC), 0, 32);
+
+        // Example sensitive data to be encrypted
+        $sensitiveData = "Sensitive data example";
+        $iv = openssl_random_pseudo_bytes(16);
+        $encryptedMessage = openssl_encrypt($sensitiveData, 'aes-256-cbc', $combinedKey, OPENSSL_RAW_DATA, $iv);
+
+        // Connect to database (replace with your connection details)
+        $conn = new mysqli("localhost", "username", "password", "database_name");
+        if ($conn->connect_error) {
+            die("Connection failed: " . $conn->connect_error);
         }
-    </script>
+
+        // Prepare and execute insert query with secure parameters
+        $stmt = $conn->prepare("INSERT INTO BohemianNew (Name, AnonymizedIP, HashedMAC, EncryptedMessage, IV) VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param("sssss", $username, $anonymizedIP, $hashedMAC, $encryptedMessage, $iv);
+        if ($stmt->execute()) {
+
+            // Send OTP email (replace with your email sending logic)
+            $subject = "Account Verification for " . $username;
+            $message = "Your OTP to verify your account is: " . $otp;
+            mail($email, $subject, $message);
+
+            // Success message
+            $message = "Account created successfully. Please check your email to verify.";
+        } else {
+            $errorMessage = "Error creating account: " . $conn->error;
+        }
+
+        $stmt->close();
+        $conn->close();
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sign Up</title>
 </head>
 <body>
-    <form onsubmit="checkName(event)">
-        <label for="name">Enter your name:</label>
-        <input type="text" id="name" name="name" required>
-        <button type="submit">Submit</button>
-    </form>
+  <?php if (!empty($errorMessage)) : ?>
+    <p style="color: red;"><?= $errorMessage ?></p>
+  <?php endif; ?>
+  <?php if (isset($message)) : ?>
+    <p><?= $message ?></p>
+  <?php endif; ?>
+  <form method="post">
+    <label for="username">Name:</label>
+    <input type="text" name="username" id="username" required><br><br>
+    <label for="email">Email:</label>
+    <input type="email" name="email" id="email" required><br><br>
+    <label for="password">Password:</label>
+    <input type="password" name="password" id="password" required><br><br>
+    <input type="submit" value="Sign Up">
+  </form>
 </body>
 </html>

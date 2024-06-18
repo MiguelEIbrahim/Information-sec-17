@@ -1,7 +1,6 @@
 CREATE TABLE Pokes (
-    Bohemian_Name VARCHAR(500) PRIMARY KEY,
-    Yondora_Name (550)
+    Bohemian_ID INT,  -- references Bohemian table ID
+    Yondora_Name VARCHAR(550), -- references Yondora Name
+    FOREIGN KEY (Bohemian_ID) REFERENCES Bohemian(ID),
+    FOREIGN KEY (Yondora_Name) REFERENCES Yondora(Name)
 );
---This table updates itself --
--- It is usefull for knowing who voted for who--
--- This prevents duplicates --

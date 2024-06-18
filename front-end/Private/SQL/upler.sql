@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 17, 2024 at 11:36 AM
+-- Generation Time: Jun 18, 2024 at 10:48 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -28,7 +28,23 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `bohemian` (
-  `Name` varchar(500) NOT NULL
+  `ID` int(11) NOT NULL,
+  `Name` varchar(255) NOT NULL,
+  `AnonymizedIP` varchar(255) NOT NULL,
+  `HashedMAC` varchar(255) NOT NULL,
+  `EncryptedMessage` varbinary(4096) NOT NULL,
+  `IV` varbinary(16) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `pokes`
+--
+
+CREATE TABLE `pokes` (
+  `Bohemian_ID` int(11) DEFAULT NULL,
+  `Yondora_Name` varchar(550) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -135,13 +151,41 @@ INSERT INTO `yondora` (`Name`, `Elder`, `Num_Times_Poked`, `Evil_Plan`) VALUES
 -- Indexes for table `bohemian`
 --
 ALTER TABLE `bohemian`
-  ADD PRIMARY KEY (`Name`);
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Indexes for table `pokes`
+--
+ALTER TABLE `pokes`
+  ADD KEY `Bohemian_ID` (`Bohemian_ID`),
+  ADD KEY `Yondora_Name` (`Yondora_Name`);
 
 --
 -- Indexes for table `yondora`
 --
 ALTER TABLE `yondora`
   ADD PRIMARY KEY (`Name`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `bohemian`
+--
+ALTER TABLE `bohemian`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `pokes`
+--
+ALTER TABLE `pokes`
+  ADD CONSTRAINT `pokes_ibfk_1` FOREIGN KEY (`Bohemian_ID`) REFERENCES `bohemian` (`ID`),
+  ADD CONSTRAINT `pokes_ibfk_2` FOREIGN KEY (`Yondora_Name`) REFERENCES `yondora` (`Name`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
