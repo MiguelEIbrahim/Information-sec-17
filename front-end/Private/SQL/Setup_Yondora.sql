@@ -1,13 +1,15 @@
 -- Create the bohemian table
-CREATE TABLE bohemian (
-    Name VARCHAR(100) PRIMARY KEY,
+CREATE TABLE Yondora (
+    Name VARCHAR(550) PRIMARY KEY,
     Elder INT,
     Num_Times_Poked INT,
     Evil_Plan TEXT
 );
 
+--Text can lso be a varchar of size MaxInt Allowed in your Database--
+
 -- Insert additional data into the bohemian table
-INSERT INTO bohemian (Name, Elder, Num_Times_Poked, Evil_Plan) VALUES
+INSERT INTO Yondora (Name, Elder, Num_Times_Poked, Evil_Plan) VALUES
 ('Alice Johnson', 45, 10, 'Alice aims to implement comprehensive education reforms that focus on reducing disparities, increasing access to quality education, and integrating technology in classrooms.'),
 ('Bob Smith', 52, 15, 'Bob is focused on himself, he says bamboos are very tasty.'),
 ('Thor', 1500, 5, 'Thor is quite focused on protecting human rights, he says he wants to bring his mjolnir down on justice, no idea what that means.'),
