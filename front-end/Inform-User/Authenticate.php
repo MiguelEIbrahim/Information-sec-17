@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt_check_email->execute();
         $stmt_check_email->store_result();
         if ($stmt_check_email->num_rows > 0) {
-            $errorMessage = "Account with this email already exists.";
+            $errorMessage = "Account Exists";
             $stmt_check_email->close();
             $conn->close();
             // Handle error or redirect as needed
@@ -74,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 mail($email, $subject, $message);
 
                 // Redirect to another page after successful registration
-                header("Location: success.php");
+                header("Location: ../../../../Information-sec-17/front-end/Private/Vote/Listing.php");
                 exit();
             } else {
                 $errorMessage = "Error creating account: " . $conn->error;
