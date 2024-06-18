@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $encryptedMessage = openssl_encrypt($sensitiveData, 'aes-256-cbc', $combinedKey, OPENSSL_RAW_DATA, $iv);
 
         // Connect to database
-        $conn = new mysqli("localhost", "root", "", "database_name"); // Use XAMPP defaults
+        $conn = new mysqli("localhost", "root", "", "upler"); // Use XAMPP defaults
         if ($conn->connect_error) {
             die("Connection failed: " . $conn->connect_error);
         }
@@ -58,8 +58,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $message = "Your OTP to verify your account is: " . $otp;
             mail($email, $subject, $message);
 
-            // Success message
-            $message = "Account created successfully. Please check your email to verify.";
+            // Redirect to another page
+            header("Location: ../../../../Information-sec-17/front-end/Private/Vote/Listing.php");
+            exit();
         } else {
             $errorMessage = "Error creating account: " . $conn->error;
         }
