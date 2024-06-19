@@ -32,7 +32,7 @@
   }
 
   // Prepare a secure SQL statement to prevent SQL injection
-  $sql = "SELECT Name, Elder, Num_Times_Poked FROM yondora";
+  $sql = "SELECT Name, Elder, Num_Times_Poked, Evil_Plan FROM yondora";
   $stmt = mysqli_prepare($conn, $sql);
 
   // Execute the prepared statement
@@ -41,7 +41,7 @@
   }
 
   // Bind results to variables (optional, but improves readability)
-  $stmt->bind_result($name, $elder, $num_times_poked);
+  $stmt->bind_result($name, $elder, $num_times_poked, $evil_plan);
 
   // Fetch data from the database
   $profiles = array();
@@ -53,7 +53,8 @@
       "name" => $name,
       "elder" => $elder,
       "num_times_poked" => $num_times_poked,
-      "image" => $imageName . '.jpg' // Assuming jpg format
+      "image" => $imageName . '.jpg', // Assuming jpg format
+      "evil_plan" => $evil_plan
     );
   }
 
@@ -69,7 +70,7 @@
       <?php $imagePath = "../img/"; ?>
       <img src="<?php echo $imagePath . $profile['image']; ?>" class="profile-image">
       <p>Age: <?php echo $profile["elder"] ?></p>
-
+      <p> <?php echo $profile["evil_plan"]?></p>
       <button data-profile-name="<?php echo htmlspecialchars($profile["name"]); ?>">Vote</button>
 
     </div>
