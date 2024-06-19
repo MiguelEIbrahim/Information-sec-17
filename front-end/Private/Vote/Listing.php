@@ -8,7 +8,6 @@
   <link rel="icon" href="../../../img/logo-black.png" type="image/png">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://trusted-cdn.com;">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-
 </head>
 <body>
 
@@ -16,7 +15,6 @@
 
 <div id="profiles">
   <?php
-
   // Database connection details (replace with your actual credentials)
   $servername = "localhost";
   $username = "root";
@@ -62,6 +60,8 @@
   $stmt->close();
   $conn->close();
 
+  // Shuffle profiles to randomize their placement
+  shuffle($profiles);
   ?>
 
   <?php foreach ($profiles as $profile): ?>
@@ -69,10 +69,9 @@
       <h2><?php echo htmlspecialchars($profile["name"]); ?></h2>
       <?php $imagePath = "../img/"; ?>
       <img src="<?php echo $imagePath . $profile['image']; ?>" class="profile-image">
-      <p>Age: <?php echo $profile["elder"] ?></p>
-      <p> <?php echo $profile["evil_plan"]?></p>
+      <p>Age: <?php echo htmlspecialchars($profile["elder"]); ?></p>
+      <p><?php echo htmlspecialchars($profile["evil_plan"]); ?></p>
       <button data-profile-name="<?php echo htmlspecialchars($profile["name"]); ?>">Vote</button>
-
     </div>
   <?php endforeach; ?>
 </div>
