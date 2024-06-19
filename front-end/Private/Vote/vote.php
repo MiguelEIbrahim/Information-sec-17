@@ -18,8 +18,14 @@ if ($conn->connect_error) {
 
 // Retrieve and decode the POST data
 $postData = json_decode(file_get_contents('php://input'), true);
-$profileName = $postData['profileName'];
-$encryptedUserID = base64_decode($postData['encryptedUserID']);
+$profileName = isset($postData['profileName']) ? $postData['profileName'] : '';
+$encryptedUserID = isset($postData['encryptedUserID']) ? base64_decode($postData['encryptedUserID']) : '';
+
+if (empty($profileName) || empty($encryptedUserID)) {
+    echo json_encode(array('success' => false, 'message' => 'Invalid request.'));
+    $conn->close();
+    exit();
+}
 
 // Anonymize IP and hash MAC for encryption key (adjust as per your server/client setup)
 $ip = $_SERVER['REMOTE_ADDR'];
@@ -32,6 +38,12 @@ $combinedKey = substr(hash('sha256', $anonymizedIP . $hashedMAC), 0, 32);
 $iv = substr($encryptedUserID, 0, 16); // Assuming the IV is prepended to the encrypted user ID
 $encryptedUserID = substr($encryptedUserID, 16);
 $userID = openssl_decrypt($encryptedUserID, 'aes-256-cbc', $combinedKey, 0, $iv);
+
+if (!$userID) {
+    echo json_encode(array('success' => false, 'message' => 'Failed to decrypt user ID.'));
+    $conn->close();
+    exit();
+}
 
 // Check if user has already voted for this profile
 $stmt_check_vote = $conn->prepare("SELECT * FROM Pokes WHERE Bohemian_ID = ? AND Yondora_Name = ?");

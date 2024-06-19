@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $hashedMAC = hash('sha256', $mac);
         $combinedKey = substr(hash('sha256', $anonymizedIP . $hashedMAC), 0, 32);
 
-        // Example sensitive data to be encrypted
+        // Example sensitive data to be encrypted (you can modify this)
         $sensitiveData = "Sensitive data example";
         $iv = openssl_random_pseudo_bytes(16);
         $encryptedMessage = openssl_encrypt($sensitiveData, 'aes-256-cbc', $combinedKey, OPENSSL_RAW_DATA, $iv);
@@ -83,6 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Prepare and execute insert query with secure parameters
             $stmt_insert = $conn->prepare("INSERT INTO Bohemian (Name, AnonymizedIP, HashedMAC, EncryptedMessage, IV, Email) VALUES (?, ?, ?, ?, ?, ?)");
             $stmt_insert->bind_param("ssssss", $username, $anonymizedIP, $hashedMAC, $encryptedMessage, $iv, $email);
+            
             if ($stmt_insert->execute()) {
 
                 // Get the ID of the inserted user
@@ -95,11 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['user_id'] = $encryptedUserID;
 
                 // Store encrypted user ID in browser cache (using JavaScript)
-                echo "<script>
-                        localStorage.setItem('user_id', '" . base64_encode($encryptedUserID) . "');
-                      </script>";
-
-                // Redirect to another page after successful registration
+                
                 header("Location: ../../../../Information-sec-17/front-end/Private/Vote/Listing.php");
                 exit();
             } else {
@@ -116,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!DOCTYPE html>
 <html>
 <head>
-<link rel="icon" href="../../img/logo-black.png" type="image/png">
+    <link rel="icon" href="../../img/logo-black.png" type="image/png">
 
     <style>
         body {
@@ -203,5 +200,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="submit" value="Sign Up">
         </form>
     </div>
+
+    <script>
+        // Add this script to ensure localStorage update
+        document.addEventListener('DOMContentLoaded', () => {
+            const encryptedUserID = localStorage.getItem('user_id');
+            if (encryptedUserID) {
+                const decryptedUserID = atob(encryptedUserID);
+                localStorage.setItem('user_id', decryptedUserID); // Update with decrypted value
+            }
+        });
+    </script>
 </body>
 </html>
