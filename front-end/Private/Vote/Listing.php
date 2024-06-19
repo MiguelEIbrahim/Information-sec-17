@@ -89,8 +89,32 @@
   voteButtons.forEach(button => {
     button.addEventListener('click', () => {
       const profileName = button.dataset.profileName;
-      // Implement functionality to handle vote (e.g., alert, update UI)
-      alert(`You voted for ${profileName}`);
+
+      // Get the encrypted user ID from local storage
+      const encryptedUserID = localStorage.getItem('user_id');
+
+      // Send the vote to the server via AJAX
+      fetch('vote.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          profileName: profileName,
+          encryptedUserID: encryptedUserID
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert(`You voted for ${profileName}`);
+        } else {
+          alert(data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
     });
   });
 

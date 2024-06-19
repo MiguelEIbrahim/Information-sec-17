@@ -81,8 +81,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt_check_email->close();
 
             // Prepare and execute insert query with secure parameters
-            $stmt_insert = $conn->prepare("INSERT INTO Bohemian (Name, AnonymizedIP, HashedMAC, EncryptedMessage, IV, Email, PasswordHash) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            $stmt_insert->bind_param("sssssss", $username, $anonymizedIP, $hashedMAC, $encryptedMessage, $iv, $email, $passwordHash);
+            $stmt_insert = $conn->prepare("INSERT INTO Bohemian (Name, AnonymizedIP, HashedMAC, EncryptedMessage, IV, Email) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt_insert->bind_param("ssssss", $username, $anonymizedIP, $hashedMAC, $encryptedMessage, $iv, $email);
             if ($stmt_insert->execute()) {
 
                 // Get the ID of the inserted user
