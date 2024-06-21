@@ -1,5 +1,10 @@
 <?php
 session_start();
+if (!isset($_SESSION['visited_index']) || $_SESSION['visited_index'] !== true) {
+    // Redirect to index.php
+    header("Location: /Information-sec-17/index.php");
+    exit();
+}
 header('Content-Type: application/json');
 
 // Database connection details

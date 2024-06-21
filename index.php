@@ -1,7 +1,8 @@
 <?php
 session_start();
 
-
+// Set a session variable to indicate that the user has visited the index page
+$_SESSION['visited_index'] = true;
 ?>
 <!DOCTYPE html>
 <html lang="en">
