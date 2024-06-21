@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,6 +13,14 @@
 
 </head>
 <body>
-    <h1>You are not a registered voter!</h1>
+    <div class="centered-container">
+        <h1>Are You Sure?</h1>
+        <div class="button-group">
+            <a href="./ScanID.php">
+                <button id="button1">Yes, Ofcourse</button>
+             </a>
+        </div>
+        <p>You Don't want your neighbors to know your full name</p>
+    </div>
 </body>
 </html>

@@ -1,3 +1,9 @@
+<?php
+session_start();
+
+// Set a session variable to indicate that the user has visited the index page
+$_SESSION['visited_index'] = true;
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -15,7 +21,7 @@
     <div class="centered-container">
         <h1>Safe. Voting.</h1>
         <div class="button-group">
-            <a href="./front-end/Inform-User/AtHome.html">
+            <a href="./front-end/Inform-User/AtHome.php">
                 <button id="button1">Authenticate Me</button>
              </a>
         </div>

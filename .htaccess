@@ -1,0 +1,12 @@
+RewriteEngine On
+
+# Redirect to index.php if accessing restricted pages directly
+RewriteCond %{REQUEST_URI} ^/Information-sec-17/front-end/Private/Vote/Listing.php$
+RewriteCond %{HTTP_REFERER} !^http://localhost/Information-sec-17/index.php [NC]
+RewriteRule ^ /Information-sec-17/index.php [L,R=302]
+
+# Redirect any direct access to /front-end/Private/.* to index.php
+RewriteCond %{REQUEST_URI} ^/Information-sec-17/front-end/Private/.*
+
+RewriteCond %{HTTP_REFERER} !^http://localhost/Information-sec-17/index.php [NC]
+RewriteRule ^ /Information-sec-17/index.php [L,R=302]

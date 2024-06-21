@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,13 +14,13 @@
 </head>
 <body>
     <div class="centered-container">
-        <h1>Are You Sure?</h1>
+        <h1>It's Best to be Home when Voting Online</h1>
         <div class="button-group">
-            <a href="./ScanID.html">
-                <button id="button1">Yes, Ofcourse</button>
+            <a href="./AreYouSure_Home.php">
+                <button id="button1">OK I'm Home Now</button>
              </a>
         </div>
-        <p>You Don't want your neighbors to know your full name</p>
+        <p>Public Wifi's and Your Coleagues<br> will make fun of your choices</p>
     </div>
 </body>
 </html>

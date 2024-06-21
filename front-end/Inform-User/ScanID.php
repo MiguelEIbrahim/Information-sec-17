@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,6 +13,14 @@
 
 </head>
 <body>
-    <h1>Welcome to the voting page!</h1>
+    <div class="centered-container">
+    <h1>Authenticate with itsme®</h1>
+    <a href="./Authenticate.php">
+        <button id="itsmeLogin">Login with itsme®</button>
+    </a>
+
+        </div>
+    </a>
+    <p> Since itsme is a paid software we just reroute to the next page.</p>
 </body>
 </html>

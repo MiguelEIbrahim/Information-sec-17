@@ -8,7 +8,6 @@
   <link rel="icon" href="../../../img/logo-black.png" type="image/png">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://trusted-cdn.com;">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-
 </head>
 <body>
 
@@ -16,7 +15,6 @@
 
 <div id="profiles">
   <?php
-
   // Database connection details (replace with your actual credentials)
   $servername = "localhost";
   $username = "root";
@@ -32,7 +30,7 @@
   }
 
   // Prepare a secure SQL statement to prevent SQL injection
-  $sql = "SELECT Name, Elder, Num_Times_Poked FROM yondora";
+  $sql = "SELECT Name, Elder, Num_Times_Poked, Evil_Plan FROM yondora";
   $stmt = mysqli_prepare($conn, $sql);
 
   // Execute the prepared statement
@@ -41,7 +39,7 @@
   }
 
   // Bind results to variables (optional, but improves readability)
-  $stmt->bind_result($name, $elder, $num_times_poked);
+  $stmt->bind_result($name, $elder, $num_times_poked, $evil_plan);
 
   // Fetch data from the database
   $profiles = array();
@@ -53,7 +51,8 @@
       "name" => $name,
       "elder" => $elder,
       "num_times_poked" => $num_times_poked,
-      "image" => $imageName . '.jpg' // Assuming jpg format
+      "image" => $imageName . '.jpg', // Assuming jpg format
+      "evil_plan" => $evil_plan
     );
   }
 
@@ -61,6 +60,8 @@
   $stmt->close();
   $conn->close();
 
+  // Shuffle profiles to randomize their placement
+  shuffle($profiles);
   ?>
 
   <?php foreach ($profiles as $profile): ?>
@@ -68,10 +69,9 @@
       <h2><?php echo htmlspecialchars($profile["name"]); ?></h2>
       <?php $imagePath = "../img/"; ?>
       <img src="<?php echo $imagePath . $profile['image']; ?>" class="profile-image">
-      <p>Age: <?php echo $profile["elder"] ?></p>
-
+      <p>Age: <?php echo htmlspecialchars($profile["elder"]); ?></p>
+      <p><?php echo htmlspecialchars($profile["evil_plan"]); ?></p>
       <button data-profile-name="<?php echo htmlspecialchars($profile["name"]); ?>">Vote</button>
-
     </div>
   <?php endforeach; ?>
 </div>
@@ -89,8 +89,32 @@
   voteButtons.forEach(button => {
     button.addEventListener('click', () => {
       const profileName = button.dataset.profileName;
-      // Implement functionality to handle vote (e.g., alert, update UI)
-      alert(`You voted for ${profileName}`);
+
+      // Get the encrypted user ID from local storage
+      const encryptedUserID = localStorage.getItem('user_id');
+
+      // Send the vote to the server via AJAX
+      fetch('vote.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          profileName: profileName,
+          encryptedUserID: encryptedUserID
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert(`You voted for ${profileName}`);
+        } else {
+          alert(data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
     });
   });
 

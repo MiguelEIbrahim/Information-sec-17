@@ -1,3 +1,7 @@
+
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,13 +15,17 @@
 </head>
 <body>
     <div class="centered-container">
-        <h1>It's Best to be Home when Voting Online</h1>
+        <h1>Are you using a mobile network (3G/4G/5G) or WiFi?</h1>
         <div class="button-group">
-            <a href="./AreYouSure_Home.html">
-                <button id="button1">OK I'm Home Now</button>
+            <a href="./ScanID.php">
+                <button id="button1">3G/4G/5G</button>
+             </a>
+
+             <a href="./DontUseWiFi.php">
+                <button id="button1">WiFi</button>
              </a>
         </div>
-        <p>Public Wifi's and Your Coleagues<br> will make fun of your choices</p>
+        <p>Your WiFi Provider Does not Care that Much about your Security</p>
     </div>
 </body>
 </html>

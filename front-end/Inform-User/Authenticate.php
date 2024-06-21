@@ -4,6 +4,23 @@ session_start();
 // Error message variable
 $errorMessage = "";
 
+// Function to check for foul words in username
+function containsFoulWords($username) {
+    $foulWords = array("fuck", "hitler", "nazi", "hail", "shit", "merde", "mierda");
+    foreach ($foulWords as $word) {
+        if (stripos($username, $word) !== false) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// Initialize variables
+$username = '';
+$email = '';
+$password = '';
+$verifyPassword = '';
+
 // Check if form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
@@ -16,6 +33,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Basic validation
     if (empty($username) || empty($email) || empty($password) || empty($verifyPassword)) {
         $errorMessage = "All fields are required.";
+    } else if (containsFoulWords($username)) {
+        $errorMessage = "Username contains inappropriate words.";
     } else if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $errorMessage = "Invalid email format.";
     } else if (strlen($password) < 8) {
@@ -31,9 +50,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Generate a secure password hash
         $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
-        // Generate a unique OTP (for example purposes)
-        $otp = rand(100000, 999999);
-
         // Anonymize IP and hash MAC for encryption key (adjust as per your server/client setup)
         $ip = $_SERVER['REMOTE_ADDR'];
         $mac = exec('getmac'); // Adjust as needed for clients
@@ -41,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $hashedMAC = hash('sha256', $mac);
         $combinedKey = substr(hash('sha256', $anonymizedIP . $hashedMAC), 0, 32);
 
-        // Example sensitive data to be encrypted
+        // Example sensitive data to be encrypted (you can modify this)
         $sensitiveData = "Sensitive data example";
         $iv = openssl_random_pseudo_bytes(16);
         $encryptedMessage = openssl_encrypt($sensitiveData, 'aes-256-cbc', $combinedKey, OPENSSL_RAW_DATA, $iv);
@@ -61,28 +77,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errorMessage = "Account with this email already exists.";
             $stmt_check_email->close();
             $conn->close();
-            // Handle error or redirect as needed
         } else {
             $stmt_check_email->close();
 
             // Prepare and execute insert query with secure parameters
-            $stmt_insert = $conn->prepare("INSERT INTO Bohemian (Name, AnonymizedIP, HashedMAC, EncryptedMessage, IV, Email) VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt_insert->bind_param("ssssss", $username, $anonymizedIP, $hashedMAC, $encryptedMessage, $iv, $email);
+            $stmt_insert = $conn->prepare("INSERT INTO Bohemian (Name, AnonymizedIP, HashedMAC, EncryptedMessage, IV, Email, PasswordHash, Salt, EncryptionKey) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt_insert->bind_param("sssssssss", $username, $anonymizedIP, $hashedMAC, $encryptedMessage, $iv, $email, $passwordHash, $salt, $encryptionKey);
+            
             if ($stmt_insert->execute()) {
 
                 // Get the ID of the inserted user
                 $userID = $stmt_insert->insert_id;
 
-                // Store user ID in session
-                $_SESSION['user_id'] = $userID;
+                // Encrypt the user ID
+                $encryptedUserID = openssl_encrypt($userID, 'aes-256-cbc', $combinedKey, 0, $iv);
 
-                // Send OTP email (replace with your email sending logic)
-                $subject = "Account Verification for " . $username;
-                $message = "Your OTP to verify your account is: " . $otp;
-                mail($email, $subject, $message);
+                // Store encrypted user ID in session
+                $_SESSION['user_id'] = $encryptedUserID;
 
-                // Redirect to another page after successful registration
-                header("Location: ../../../../Information-sec-17/front-end/Private/Vote/Listing.php");
+                // Store encrypted user ID in browser cache (using JavaScript)
+                echo "<script>
+                    localStorage.setItem('user_id', '".base64_encode($encryptedUserID)."');
+                    window.location.href = '../../../../Information-sec-17/front-end/Private/Vote/vote.php';
+                </script>";
                 exit();
             } else {
                 $errorMessage = "Error creating account: " . $conn->error;
@@ -98,6 +115,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!DOCTYPE html>
 <html>
 <head>
+    <link rel="icon" href="../../img/logo-black.png" type="image/png">
+
     <style>
         body {
             display: flex;
@@ -173,9 +192,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
         <form method="post">
             <label for="username">Username:</label>
-            <input type="text" name="username" id="username" required>
+            <input type="text" name="username" id="username" value="<?= htmlspecialchars($username) ?>" required>
             <label for="email">Email:</label>
-            <input type="email" name="email" id="email" required>
+            <input type="email" name="email" id="email" value="<?= htmlspecialchars($email) ?>" required>
             <label for="password">Password:</label>
             <input type="password" name="password" id="password" required>
             <label for="verify_password">Verify Password:</label>
@@ -183,5 +202,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="submit" value="Sign Up">
         </form>
     </div>
+
+    <script>
+        // No need to decrypt and store decrypted value in localStorage
+    </script>
 </body>
 </html>
