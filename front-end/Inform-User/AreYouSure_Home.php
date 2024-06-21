@@ -16,7 +16,7 @@ session_start();
     <div class="centered-container">
         <h1>Are You Sure?</h1>
         <div class="button-group">
-            <a href="./AreYouUsingGSMorWiFi.html">
+            <a href="./AreYouUsingGSMorWiFi.php">
                 <button id="button1">Yes, Ofcourse</button>
              </a>
         </div>

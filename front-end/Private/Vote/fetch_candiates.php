@@ -3,7 +3,7 @@
 $servername = "localhost";
 $username = "roote";
 $password = "";
-$dbname = "uplet";
+$dbname = "upler";
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);

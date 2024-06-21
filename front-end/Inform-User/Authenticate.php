@@ -6,7 +6,7 @@ $errorMessage = "";
 
 // Function to check for foul words in username
 function containsFoulWords($username) {
-    $foulWords = array("fuck", "hitler", "nazi", "hail", "shit", "merde", "mierda"); // Replace with actual words
+    $foulWords = array("fuck", "hitler", "nazi", "hail", "shit", "merde", "mierda");
     foreach ($foulWords as $word) {
         if (stripos($username, $word) !== false) {
             return true;
@@ -81,8 +81,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt_check_email->close();
 
             // Prepare and execute insert query with secure parameters
-            $stmt_insert = $conn->prepare("INSERT INTO Bohemian (Name, AnonymizedIP, HashedMAC, EncryptedMessage, IV, Email) VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt_insert->bind_param("ssssss", $username, $anonymizedIP, $hashedMAC, $encryptedMessage, $iv, $email);
+            $stmt_insert = $conn->prepare("INSERT INTO Bohemian (Name, AnonymizedIP, HashedMAC, EncryptedMessage, IV, Email, PasswordHash, Salt, EncryptionKey) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt_insert->bind_param("sssssssss", $username, $anonymizedIP, $hashedMAC, $encryptedMessage, $iv, $email, $passwordHash, $salt, $encryptionKey);
             
             if ($stmt_insert->execute()) {
 
@@ -96,8 +96,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['user_id'] = $encryptedUserID;
 
                 // Store encrypted user ID in browser cache (using JavaScript)
-                
-                header("Location: ../../../../Information-sec-17/front-end/Private/Vote/Listing.php");
+                echo "<script>
+                    localStorage.setItem('user_id', '".base64_encode($encryptedUserID)."');
+                    window.location.href = '../../../../Information-sec-17/front-end/Private/Vote/vote.php';
+                </script>";
                 exit();
             } else {
                 $errorMessage = "Error creating account: " . $conn->error;
@@ -202,14 +204,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <script>
-        // Add this script to ensure localStorage update
-        document.addEventListener('DOMContentLoaded', () => {
-            const encryptedUserID = localStorage.getItem('user_id');
-            if (encryptedUserID) {
-                const decryptedUserID = atob(encryptedUserID);
-                localStorage.setItem('user_id', decryptedUserID); // Update with decrypted value
-            }
-        });
+        // No need to decrypt and store decrypted value in localStorage
     </script>
 </body>
 </html>

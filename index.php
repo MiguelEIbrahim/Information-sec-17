@@ -21,7 +21,7 @@ $_SESSION['visited_index'] = true;
     <div class="centered-container">
         <h1>Safe. Voting.</h1>
         <div class="button-group">
-            <a href="./front-end/Inform-User/AtHome.html">
+            <a href="./front-end/Inform-User/AtHome.php">
                 <button id="button1">Authenticate Me</button>
              </a>
         </div>

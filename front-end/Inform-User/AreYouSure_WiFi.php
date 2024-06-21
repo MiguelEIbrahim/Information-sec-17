@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,7 +16,7 @@
     <div class="centered-container">
         <h1>Are You Sure?</h1>
         <div class="button-group">
-            <a href="./ScanID.html">
+            <a href="./ScanID.php">
                 <button id="button1">Yes, Ofcourse</button>
              </a>
         </div>

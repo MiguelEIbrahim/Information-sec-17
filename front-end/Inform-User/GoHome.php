@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,7 +16,7 @@
     <div class="centered-container">
         <h1>It's Best to be Home when Voting Online</h1>
         <div class="button-group">
-            <a href="./AreYouSure_Home.html">
+            <a href="./AreYouSure_Home.php">
                 <button id="button1">OK I'm Home Now</button>
              </a>
         </div>

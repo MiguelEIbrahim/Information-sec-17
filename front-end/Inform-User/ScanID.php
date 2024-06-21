@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,7 +15,7 @@
 <body>
     <div class="centered-container">
     <h1>Authenticate with itsme®</h1>
-    <a href="./Authenticate.html">
+    <a href="./Authenticate.php">
         <button id="itsmeLogin">Login with itsme®</button>
     </a>
 

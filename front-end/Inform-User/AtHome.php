@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,10 +16,10 @@
     <div class="centered-container">
         <h1>Are you in a safe environment<br> with no Preying Eyes?</h1>
         <div class="button-group">
-            <a href="./GoHome.html">
+            <a href="./GoHome.php">
                 <button id="button1">No</button>
              </a>
-             <a href="./AreYouUsingGSMorWiFi.html">
+             <a href="./AreYouUsingGSMorWiFi.php">
                 <button id="button1">Yes</button>
              </a>
         </div>
