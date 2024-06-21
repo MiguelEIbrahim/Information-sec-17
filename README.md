@@ -65,3 +65,14 @@ Additional Questions:
     62864628009582789845
     31968000000000000000
     0. Yes its alot of numbers, so yes it is possible to randomize the selection.
+
+
+When the ZIP file is extracted, the user can navigate to the secure-folder and run generate_key.php to generate and display the key.
+Step 5: Automate Key Generation on Extraction (Optional)
+
+Automating the key generation on extraction is more complex and depends on the operating system. For example, on Linux, you can use a script that extracts the ZIP file and then runs generate_key.php.
+`
+sh
+
+unzip secure-folder.zip
+php secure-folder/generate_key.php`
