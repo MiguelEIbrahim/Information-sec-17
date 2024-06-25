@@ -43,13 +43,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errorMessage = "Passwords do not match.";
     } else {
 
-        // Generate random salt and encryption key
-        $salt = base64_encode(random_bytes(16));
-        $encryptionKey = base64_encode(random_bytes(32));
-
-        // Generate a secure password hash
-        $passwordHash = password_hash($password, PASSWORD_DEFAULT);
-
         // Anonymize IP and hash MAC for encryption key (adjust as per your server/client setup)
         $ip = $_SERVER['REMOTE_ADDR'];
         $mac = exec('getmac'); // Adjust as needed for clients
@@ -81,8 +74,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt_check_email->close();
 
             // Prepare and execute insert query with secure parameters
-            $stmt_insert = $conn->prepare("INSERT INTO Bohemian (Name, AnonymizedIP, HashedMAC, EncryptedMessage, IV, Email, PasswordHash, Salt, EncryptionKey) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt_insert->bind_param("sssssssss", $username, $anonymizedIP, $hashedMAC, $encryptedMessage, $iv, $email, $passwordHash, $salt, $encryptionKey);
+            $stmt_insert = $conn->prepare("INSERT INTO Bohemian (Name, AnonymizedIP, HashedMAC, EncryptedMessage, IV, Email) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt_insert->bind_param("ssssss", $username, $anonymizedIP, $hashedMAC, $encryptedMessage, $iv, $email);
             
             if ($stmt_insert->execute()) {
 
@@ -95,10 +88,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Store encrypted user ID in session
                 $_SESSION['user_id'] = $encryptedUserID;
 
+                // Set a cookie with expiration of 10 minutes
+                setcookie('user_id', base64_encode($encryptedUserID), time() + 600, "/");
+
                 // Store encrypted user ID in browser cache (using JavaScript)
                 echo "<script>
                     localStorage.setItem('user_id', '".base64_encode($encryptedUserID)."');
-                    window.location.href = '../../../../Information-sec-17/front-end/Private/Vote/vote.php';
+                    sessionStorage.setItem('user_id', '".base64_encode($encryptedUserID)."');
+                    window.location.href = '../../../../Information-sec-17/front-end/Private/Vote/listing.php';
                 </script>";
                 exit();
             } else {
