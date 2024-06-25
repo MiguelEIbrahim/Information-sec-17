@@ -76,7 +76,7 @@
   <?php endforeach; ?>
 </div>
 
-<div id="modal" class="modal">
+<div id="modal" class="modal" style="display:none;">
   <div class="modal-content">
     <span class="close-button">&times;</span>
     <div id="profile-details"></div>
@@ -85,6 +85,9 @@
 
 <script>
   const voteButtons = document.querySelectorAll('button[data-profile-name]');
+  const modal = document.getElementById('modal');
+  const profileDetails = document.getElementById('profile-details');
+  const closeButton = document.querySelector('.close-button');
 
   voteButtons.forEach(button => {
     button.addEventListener('click', () => {
@@ -107,7 +110,8 @@
       .then(response => response.json())
       .then(data => {
         if (data.success) {
-          alert(`You voted for ${profileName}`);
+          profileDetails.innerHTML = `<p>${data.message}</p>`;
+          modal.style.display = 'block';
         } else {
           alert(data.message);
         }
@@ -118,7 +122,9 @@
     });
   });
 
-  // Add remaining JavaScript code for modal handling etc. (existing code)
+  closeButton.addEventListener('click', () => {
+    modal.style.display = 'none';
+  });
 </script>
 
 </body>
